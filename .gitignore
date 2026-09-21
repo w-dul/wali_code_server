@@ -1,0 +1,18 @@
+/.idea/
+/data/log/log-error-2026-06-18.0.log
+/data/log/log-info-2026-06-18.0.log
+/data/log/log_error.log
+/walicode-server-app/data/log/log_error.log
+/data/log/log_info.log
+/walicode-server-app/data/log/log_info.log
+/*/target/
+/data/log/log-error-2026-06-20.0.log
+/data/log/log-info-2026-06-20.0.log
+/data/log/*.log
+
+# Local secrets and developer-specific configuration
+.env
+.env.*
+!.env.example
+.local-config
+*.bak
