@@ -12,6 +12,6 @@ ENV TZ=PRC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 添加应用
-ADD target/walissh-server-app.jar /walissh-server-app.jar
+ADD target/walicode-server-app.jar /walicode-server-app.jar
 
-ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS /walissh-server-app.jar $PARAMS"]
+ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS /walicode-server-app.jar $PARAMS"]
