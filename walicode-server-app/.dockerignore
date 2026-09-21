@@ -1,0 +1,4 @@
+*
+!Dockerfile
+!target/
+!target/walicode-server-app.jar
