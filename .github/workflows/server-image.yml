@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -50,3 +51,41 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+
+  deploy-smoke:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: local
+
+    steps:
+      - name: Deploy to target host over SSH
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          GHCR_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          envs: IMAGE_TAG,GHCR_USERNAME,GHCR_TOKEN
+          script: |
+            set -e
+
+            IMAGE="ghcr.io/w-dul/wali_code_server:${IMAGE_TAG}"
+
+            printf '%s' "$GHCR_TOKEN" | docker login ghcr.io \
+              --username "$GHCR_USERNAME" \
+              --password-stdin
+
+            docker pull "$IMAGE"
+            docker rm -f walicode-server-local 2>/dev/null || true
+
+            docker run -d \
+              --name walicode-server-local \
+              --restart unless-stopped \
+              -p 8091:8091 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              "$IMAGE"
+
+            docker ps -a --filter name=walicode-server-local
